@@ -1,13 +1,8 @@
 <?php
 
-spl_autoload_register(function ($class) {
-    require __DIR__ . "/../common/$class.php";
-});
+require_once __DIR__ . "/../common/connect.php";
 
 require __DIR__ . "/variante.php";
-
-set_exception_handler("errorHandler::handleException");
-set_error_handler("errorHandler::handleError");
 
 Class Prodotto
 {
@@ -37,7 +32,7 @@ Class Prodotto
         WHERE `carrello`.`utente` = :utente AND `carrello`.`variante` = :prodotto";
 
         // Preparo la query e associo i bind ai parametri
-        $stmt = $this->connnection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
         $stmt->bindValue(':variante', $prodotto, PDO::PARAM_INT);
 
@@ -53,7 +48,7 @@ Class Prodotto
         WHERE `p`.`id` = :prodotto";
 
         // Preparo la query e associo i bind ai parametri
-        $stmt = $this->connnection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':prodotto', $prodotto, PDO::PARAM_INT);
 
         // Eseguo
@@ -81,7 +76,7 @@ Class Prodotto
         WHERE `p`.`attivo` = 1";
 
         // Preparo la query e associo i bind ai parametri
-        $stmt = $this->connnection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
 
         // Eseguo
         $stmt->execute();

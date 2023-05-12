@@ -1,11 +1,6 @@
 <?php
 
-spl_autoload_register(function ($class) {
-    require __DIR__ . "/../common/$class.php";
-});
-
-set_exception_handler("errorHandler::handleException");
-set_error_handler("errorHandler::handleError");
+require_once __DIR__ . "/../common/connect.php";
 
 Class Variante
 {
@@ -34,7 +29,7 @@ Class Variante
         WHERE `p`.`id` = :variante";
 
         // Preparo la query e associo i bind ai parametri
-        $stmt = $this->connnection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':variante', $variante, PDO::PARAM_INT);
 
         // Eseguo
@@ -58,7 +53,7 @@ Class Variante
         WHERE `p`.`prodotto` = :prodotto";
 
         // Preparo la query e associo i bind ai parametri
-        $stmt = $this->connnection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':prodotto', $prodotto, PDO::PARAM_INT);
 
         // Eseguo

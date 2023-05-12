@@ -1,8 +1,6 @@
 <?php
 
-spl_autoload_register(function ($class) {
-    require __DIR__ . "/../common/$class.php";
-});
+require_once __DIR__ . "/../common/connect.php";
 
 Class Sessione
 {
@@ -24,9 +22,9 @@ Class Sessione
     {
         // Creo una nuova sessione
         $sql = "INSERT INTO sessione ( `id`, `utente` )
-        SELECT UUID() AS 'id', `utente`.`id` AS 'utente'
-        FROM `utente`
-        WHERE `utente`.`email` = :email AND `utente`.`password` = :password";
+                SELECT UUID() AS 'id', `utente`.`id` AS 'utente'
+                FROM `utente`
+                WHERE `utente`.`email` = :email AND `utente`.`password` = :password";
 
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':email', $email, PDO::PARAM_STR);
@@ -41,9 +39,9 @@ Class Sessione
 
         // Ottengo i dati della sessione appena creata
         $sql = "SELECT `sessione`.`id` AS 'id'
-        FROM `sessione`
-        INNER JOIN `utente` u ON u.`id` = `sessione`.`utente`
-        WHERE CURRENT_DATE() < `sessione`.`scadenza` AND u.`email` = :email";
+                FROM `sessione`
+                INNER JOIN `utente` u ON u.`id` = `sessione`.`utente`
+                WHERE CURRENT_DATE() < `sessione`.`scadenza` AND u.`email` = :email";
 
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':email', $email, PDO::PARAM_STR);
@@ -57,6 +55,8 @@ Class Sessione
         {
             // Popolo le proprietà della classe con i dati appena trovati
             $this->SessionID = $result[0]["id"];
+
+            setcookie("sessione", $this->SessionID, time()+60*60*24*30, '/');
         }
         else
         {
@@ -64,12 +64,14 @@ Class Sessione
         }
     }
 
-    public function ottieniSessione($sessione)
+    public function ottieniSessione()
     {
+        $sessione = $_COOKIE['sessione'];
+
         // Ottengo la sessione valida
         $sql = "SELECT `sessione`.`id` AS `id`, `sessione`.`utente` AS `utente`
-        FROM `sessione`
-        WHERE `sessione`.`id` = :session AND CURRENT_DATE() < `sessione`.`scadenza` AND `sessione`.`attivo` = TRUE";
+                FROM `sessione`
+                WHERE `sessione`.`id` = :sessione AND CURRENT_DATE() < `sessione`.`scadenza` AND `sessione`.`attivo` = TRUE";
 
 
         $stmt = $this->connection->prepare($sql);
@@ -96,7 +98,7 @@ Class Sessione
 
     public function rinnova()
     {
-        $sessione = $_COOKIE['sessione'];
+        $sessione = $this->SessionID;
 
         $sql = "UPDATE sessione
         SET scadenza = DATE_ADD(CURRENT_DATE(), INTERVAL 1 MONTH)

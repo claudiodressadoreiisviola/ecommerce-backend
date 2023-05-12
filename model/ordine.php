@@ -1,10 +1,6 @@
 <?php
 
-spl_autoload_register(function ($class) {
-    require __DIR__ . "/../common/$class.php";
-});
-
-require __DIR__ . "/variante.php";
+require_once __DIR__ . "/../common/connect.php";
 
 Class Ordine
 {
@@ -29,9 +25,9 @@ Class Ordine
     {
         // Creo l'ordine
         $sql = "INSERT INTO ordine_prodotto ( utente, stato, attivo )
-        VALUES ( :utente, 'Inviato', TRUE )";
+                VALUES ( :utente, 'Inviato', TRUE )";
 
-        $stmt = $this->connnection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
 
         // Eseguo
@@ -42,13 +38,13 @@ Class Ordine
 
         // Sposto i prodotti dal carrello all'ordine
         $sql = "INSERT INTO ordine ( ordine, variante, quantita )
-        SELECT :ordine, v.`id` AS 'variante', c.quantita AS 'quantita'
-        FROM carrello c
-        INNER JOIN variante v ON c.`variante` = v.`id`
-        INNER JOIN prodotto p ON p.`id` = v.`prodotto`
-        WHERE c.`utente` = :utente";
+                SELECT :ordine, v.`id` AS 'variante', c.quantita AS 'quantita'
+                FROM carrello c
+                INNER JOIN variante v ON c.`variante` = v.`id`
+                INNER JOIN prodotto p ON p.`id` = v.`prodotto`
+                WHERE c.`utente` = :utente";
 
-        $stmt = $this->connnection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
         $stmt->bindValue(':ordine', $ordine, PDO::PARAM_INT);
 
@@ -58,15 +54,15 @@ Class Ordine
 
     public function visualizzaOrdine($utente, $ordine)
     {
-        $sql = "SELECT op.`variante` AS 'Variante', p.`nome` AS 'Nome prodotto', v.`nome` AS 'Nome variante', op.`quantita` AS 'Quantità'
-        FROM `ordine_prodotto` op
-        INNER JOIN `variante` v ON v.`id` = op.`variante`
-        INNER JOIN `prodotto` p ON p.`id` = v.`prodotto`
-        INNER JOIN `ordine` o ON o.`id` = op.`ordine`
-        INNER JOIN `utente` u ON u.`id` = o.`utente`
-        WHERE op.`ordine` = :ordine AND u.`id` = :utente";
+        $sql = "SELECT op.`variante` AS 'variante', p.`nome` AS 'nome prodotto', v.`nome` AS 'nome variante', op.`quantita` AS 'quantita'
+                FROM `ordine_prodotto` op
+                INNER JOIN `variante` v ON v.`id` = op.`variante`
+                INNER JOIN `prodotto` p ON p.`id` = v.`prodotto`
+                INNER JOIN `ordine` o ON o.`id` = op.`ordine`
+                INNER JOIN `utente` u ON u.`id` = o.`utente`
+                WHERE op.`ordine` = :ordine AND u.`id` = :utente";
 
-        $stmt = $this->connnection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
         $stmt->bindValue(':ordine', $ordine, PDO::PARAM_INT);
 
@@ -75,7 +71,7 @@ Class Ordine
 
         // Metto il risultato in un array associativo e lo ritorno
         $risultato = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        var_dump($risultato);
+
         return $risultato;
     }
 }

@@ -1,13 +1,6 @@
 <?php
 
-spl_autoload_register(function ($class) {
-    require __DIR__ . "/../common/$class.php";
-});
-
-require __DIR__ . "/variante.php";
-
-set_exception_handler("errorHandler::handleException");
-set_error_handler("errorHandler::handleError");
+require_once __DIR__ . "/../common/connect.php";
 
 Class Carrello
 {
@@ -38,7 +31,7 @@ Class Carrello
         INNER JOIN prodotto p ON p.`id` = v.`prodotto`
         WHERE c.`utente` = :utente";
 
-        $stmt = $this->connnection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
 
         // Eseguo
@@ -54,7 +47,7 @@ Class Carrello
         $sql = "DELETE FROM `carrello`
         WHERE `carrello`.`utente` = :utente";
 
-        $stmt = $this->connnection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
 
         // Eseguo
@@ -66,7 +59,7 @@ Class Carrello
         $sql = "DELETE FROM `carrello`
         WHERE `carrello`.`utente` = :utente AND `carrello`.`variante` = :variante";
 
-        $stmt = $this->connnection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
         $stmt->bindValue(':variante', $variante, PDO::PARAM_INT);
 
@@ -79,7 +72,7 @@ Class Carrello
         $sql = "INSERT INTO `carrello` ( utente, variante, quantita )
         VALUES :utente, :variante, :quantita";
 
-        $stmt = $this->connnection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
         $stmt->bindValue(':variante', $variante, PDO::PARAM_INT);
         $stmt->bindValue(':quantita', $quantita, PDO::PARAM_INT);
@@ -93,7 +86,7 @@ Class Carrello
         $sql = "UPDATE `carrello`
         SET `quantita` = :quantita";
 
-        $stmt = $this->connnection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
         $stmt->bindValue(':variante', $variante, PDO::PARAM_INT);
         $stmt->bindValue(':quantita', $quantita, PDO::PARAM_INT);

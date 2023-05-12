@@ -25,7 +25,7 @@ Class Carrello
     public function __construct()
     {
         // Inizializzo il database
-        $this->database = new Database;
+        $this->database = new Database();
         $this->connection = $this->database->getConnection();
     }
 
@@ -38,7 +38,7 @@ Class Carrello
         INNER JOIN prodotto p ON p.`id` = v.`prodotto`
         WHERE c.`utente` = :utente";
 
-        $stmt = $this->conn->prepare($sql);
+        $stmt = $this->connnection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
 
         // Eseguo
@@ -54,7 +54,7 @@ Class Carrello
         $sql = "DELETE FROM `carrello`
         WHERE `carrello`.`utente` = :utente";
 
-        $stmt = $this->conn->prepare($sql);
+        $stmt = $this->connnection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
 
         // Eseguo
@@ -66,7 +66,7 @@ Class Carrello
         $sql = "DELETE FROM `carrello`
         WHERE `carrello`.`utente` = :utente AND `carrello`.`variante` = :variante";
 
-        $stmt = $this->conn->prepare($sql);
+        $stmt = $this->connnection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
         $stmt->bindValue(':variante', $variante, PDO::PARAM_INT);
 
@@ -79,7 +79,7 @@ Class Carrello
         $sql = "INSERT INTO `carrello` ( utente, variante, quantita )
         VALUES :utente, :variante, :quantita";
 
-        $stmt = $this->conn->prepare($sql);
+        $stmt = $this->connnection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
         $stmt->bindValue(':variante', $variante, PDO::PARAM_INT);
         $stmt->bindValue(':quantita', $quantita, PDO::PARAM_INT);
@@ -93,7 +93,7 @@ Class Carrello
         $sql = "UPDATE `carrello`
         SET `quantita` = :quantita";
 
-        $stmt = $this->conn->prepare($sql);
+        $stmt = $this->connnection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
         $stmt->bindValue(':variante', $variante, PDO::PARAM_INT);
         $stmt->bindValue(':quantita', $quantita, PDO::PARAM_INT);

@@ -4,9 +4,6 @@ spl_autoload_register(function ($class) {
     require __DIR__ . "/../common/$class.php";
 });
 
-set_exception_handler("errorHandler::handleException");
-set_error_handler("errorHandler::handleError");
-
 Class Sessione
 {
     // I dati inerenti alla sessione: l'id della sessione, l'utente e la scadenza
@@ -19,7 +16,7 @@ Class Sessione
     public function __construct()
     {
         // Inizializzo il database
-        $this->database = new Database;
+        $this->database = new Database();
         $this->connection = $this->database->getConnection();
     }
 
@@ -31,38 +28,35 @@ Class Sessione
         FROM `utente`
         WHERE `utente`.`email` = :email AND `utente`.`password` = :password";
 
-        if ($stmt->rowCount() == 0)
-        {
-            throw new Exception("Credenziali sbagliate", 1);
-        }
-
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':email', $email, PDO::PARAM_STR);
         $stmt->bindValue(':password', $password, PDO::PARAM_STR);
 
         $stmt->execute();
 
-        // Ottengo i dati della sessione appena creata
-        $sql = "SELECT `sessione`.`id` AS `id`, `utente`.`nome` AS `nome`
-        FROM `sessione`
-        INNER JOIN `utente` ON `utente`.`id` = `sessione`.`utente`
-        WHERE CURRENT_TIMESTAMP() < `sessione`.`scadenza` AND `sessione`.`attivo` = TRUE";
+        if ($stmt->rowCount() == 0)
+        {
+            throw new Exception("Credenziali sbagliate", 1);
+        }
 
+        // Ottengo i dati della sessione appena creata
+        $sql = "SELECT `sessione`.`id` AS 'id'
+        FROM `sessione`
+        INNER JOIN `utente` u ON u.`id` = `sessione`.`utente`
+        WHERE CURRENT_DATE() < `sessione`.`scadenza` AND u.`email` = :email";
 
         $stmt = $this->connection->prepare($sql);
+        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
 
         $stmt->execute();
 
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Se abbiamo un risultato
-        if(count($result) == 1)
+        if(count($result) > 0)
         {
             // Popolo le proprietà della classe con i dati appena trovati
             $this->SessionID = $result[0]["id"];
-            $this->UserID = $result[0]["utente"];
-
-            setcookie("sessione", $this->SessionID, time()+60*60*24*30, '/');
         }
         else
         {
@@ -70,15 +64,12 @@ Class Sessione
         }
     }
 
-    public function ottieniSessione()
+    public function ottieniSessione($sessione)
     {
-        // Ottengo la sessione memorizzata nel computer tramite cookie
-        $sessione = $_COOKIE['sessione'];
-
         // Ottengo la sessione valida
         $sql = "SELECT `sessione`.`id` AS `id`, `sessione`.`utente` AS `utente`
         FROM `sessione`
-        WHERE `sessione`.`id` = :session AND CURRENT_TIMESTAMP() < `sessione`.`scadenza` AND `sessione`.`attivo` = TRUE";
+        WHERE `sessione`.`id` = :session AND CURRENT_DATE() < `sessione`.`scadenza` AND `sessione`.`attivo` = TRUE";
 
 
         $stmt = $this->connection->prepare($sql);
@@ -108,7 +99,7 @@ Class Sessione
         $sessione = $_COOKIE['sessione'];
 
         $sql = "UPDATE sessione
-        SET scadenza = CURRENT_TIMESTAMP()+60*60*24*30
+        SET scadenza = DATE_ADD(CURRENT_DATE(), INTERVAL 1 MONTH)
         WHERE `sessione`.`id` = :sessione";
 
         $stmt = $this->connection->prepare($sql);

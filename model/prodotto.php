@@ -26,7 +26,7 @@ Class Prodotto
     public function __construct()
     {
         // Inizializzo il database
-        $this->database = new Database;
+        $this->database = new Database();
         $this->connection = $this->database->getConnection();
     }
 
@@ -37,7 +37,7 @@ Class Prodotto
         WHERE `carrello`.`utente` = :utente AND `carrello`.`variante` = :prodotto";
 
         // Preparo la query e associo i bind ai parametri
-        $stmt = $this->conn->prepare($sql);
+        $stmt = $this->connnection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
         $stmt->bindValue(':variante', $prodotto, PDO::PARAM_INT);
 
@@ -53,7 +53,7 @@ Class Prodotto
         WHERE `p`.`id` = :prodotto";
 
         // Preparo la query e associo i bind ai parametri
-        $stmt = $this->conn->prepare($sql);
+        $stmt = $this->connnection->prepare($sql);
         $stmt->bindValue(':prodotto', $prodotto, PDO::PARAM_INT);
 
         // Eseguo
@@ -81,7 +81,7 @@ Class Prodotto
         WHERE `p`.`attivo` = 1";
 
         // Preparo la query e associo i bind ai parametri
-        $stmt = $this->conn->prepare($sql);
+        $stmt = $this->connnection->prepare($sql);
 
         // Eseguo
         $stmt->execute();

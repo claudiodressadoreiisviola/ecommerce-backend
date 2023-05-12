@@ -5,11 +5,11 @@ class Database
 
     public function __construct()
     {
-        $host = "gruppo1.violamarchesini.it";
+        $host = "claudiodressadore.net";
         $port = "3306";
         $db   = "ecommerce";
         $user = "ecommerce";
-        $pass = "sld63u890ww09f4";
+        $pass = "amnso0d89h33a";
 
         try {
             $this->dbConnection = new PDO(

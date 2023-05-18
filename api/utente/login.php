@@ -8,9 +8,6 @@ spl_autoload_register(function ($class) {
 // Importo la classe Sessione
 require __DIR__ . "/../../model/sessione.php";
 
-set_exception_handler("errorHandler::handleException");
-set_error_handler("errorHandler::handleError");
-
 $data = json_decode(file_get_contents("php://input"));
 
 if (empty($data->email) || empty($data->password)) {

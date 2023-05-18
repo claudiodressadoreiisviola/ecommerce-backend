@@ -8,4 +8,4 @@ $sessione = new Sessione();
 
 $sessione->ottieniSessione();
 
-$carrello->svuotaCarrello();
+$carrello->svuotaCarrello($sessione->UserID);

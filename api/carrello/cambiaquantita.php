@@ -3,10 +3,9 @@ require __DIR__ . '/../../model/carrello.php';
 require __DIR__ . '/../../model/sessione.php';
 header("Content-type: application/json; charset=UTF-8");
 
-$componentiURL = parse_url($_SERVER["REQUEST_URI"]);
-parse_str($componentiURL['query'], $parametri);
+$data = json_decode(file_get_contents("php://input"));
 
-if (isset($parametri['prodotto']) == false || isset($parametri['quantita']) == false) {
+if (empty($data->variante) || empty($data->quantita)) {
     http_response_code(400);
     echo json_encode(array("message" => "Parametri non corretti o insufficienti"));
     exit();
@@ -17,4 +16,4 @@ $sessione = new Sessione();
 
 $sessione->ottieniSessione();
 
-$carrello->cambiaQuantita($sessione->UserID, $parametri['prodotto'], $parametri['quantita']);
+$carrello->cambiaQuantita($sessione->UserID, $data->variante, $data->quantita);

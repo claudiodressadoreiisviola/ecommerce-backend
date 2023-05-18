@@ -1,6 +1,7 @@
 <?php
-require __DIR__ . '/../../model/ordine.php';
-require __DIR__ . '/../../model/sessione.php';
+require_once __DIR__ . '/../../model/ordine.php';
+require_once __DIR__ . '/../../model/sessione.php';
+
 header("Content-type: application/json; charset=UTF-8");
 
 if (!isset($_GET['ordine']) || empty($_GET['ordine']) || !isset($_COOKIE['sessione']))

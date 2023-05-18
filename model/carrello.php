@@ -70,7 +70,7 @@ Class Carrello
     public function aggiungiElemento($utente, $variante, $quantita)
     {
         $sql = "INSERT INTO `carrello` ( utente, variante, quantita )
-        VALUES :utente, :variante, :quantita";
+                VALUES ( :utente, :variante, :quantita )";
 
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
@@ -84,7 +84,8 @@ Class Carrello
     public function cambiaQuantita($utente, $variante, $quantita)
     {
         $sql = "UPDATE `carrello`
-        SET `quantita` = :quantita";
+                SET `quantita` = :quantita
+                WHERE `carrello`.`utente` = :utente, `carrello`.`variante` = :variante";
 
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);

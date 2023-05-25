@@ -34,7 +34,7 @@ Class Sessione
 
         if ($stmt->rowCount() == 0)
         {
-            throw new Exception("Credenziali sbagliate", 1);
+            return 1;
         }
 
         // Ottengo i dati della sessione appena creata
@@ -57,21 +57,34 @@ Class Sessione
             $this->SessionID = $result[0]["id"];
 
             setcookie("sessione", $this->SessionID, time()+60*60*24*30, '/');
+
+            return 0;
         }
         else
         {
-            throw new Exception("Numero di sessioni attive non corretto", 1);
+            return 2;
         }
     }
 
     public function ottieniSessione()
     {
-        $sessione = $_COOKIE['sessione'];
+        if (isset($_COOKIE['sessione']))
+        {
+            $sessione = $_COOKIE['sessione'];
+        }
+        else
+        {
+            http_response_code(401);
+            echo json_encode(array("message" => "Necessario eseguire il login per usare questo servizio!"));
+            die();
+        }
+        
 
         // Ottengo la sessione valida
         $sql = "SELECT `sessione`.`id` AS `id`, `sessione`.`utente` AS `utente`
                 FROM `sessione`
-                WHERE `sessione`.`id` = :sessione AND CURRENT_DATE() < `sessione`.`scadenza` AND `sessione`.`attivo` = TRUE";
+                WHERE `sessione`.`id` = :sessione AND CURRENT_DATE() < `sessione`.`scadenza` AND `sessione`.`attivo` = TRUE
+                LIMIT 1";
 
 
         $stmt = $this->connection->prepare($sql);
@@ -92,7 +105,9 @@ Class Sessione
         }
         else
         {
-            throw new Exception("Numero di sessioni non corretto", 1);
+            http_response_code(401);
+            echo json_encode(array("message" => "Sessione non valida, esegui il login nuovamente"));
+            die();
         }
     }
 

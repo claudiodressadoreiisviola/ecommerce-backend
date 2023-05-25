@@ -19,3 +19,4 @@ $sessione->ottieniSessione();
 $indirizzo->aggiungiIndirizzo($sessione->UserID, $data->via, $data->civico, $data->comune, $data->provincia, $data->cap);
 
 echo json_encode(array("message" => "Indirizzo aggiunto con successo!"));
+?>

@@ -57,15 +57,22 @@ Class Prodotto
         // Metto il risultato in un array associativo
         $risultato = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Associo i dati appena raccolti al prodotto
-        $this->id = $risultato[0]["id"];
-        $this->nome = $risultato[0]["nome"];
-        $this->fornitore = $risultato[0]["fornitore"];
-        $this->descrizione = $risultato[0]["descrizione"];
-        $this->prezzo = $risultato[0]["prezzo"];
+        if (count($risultato) == 1)
+        {
+            // Associo i dati appena raccolti al prodotto
+            $this->id = $risultato[0]["id"];
+            $this->nome = $risultato[0]["nome"];
+            $this->fornitore = $risultato[0]["fornitore"];
+            $this->descrizione = $risultato[0]["descrizione"];
+            $this->prezzo = $risultato[0]["prezzo"];
 
-        $variante = new Variante();
-        $this->varianti = $variante->catalogo($this->id);
+            $variante = new Variante();
+            $this->varianti = $variante->catalogo($this->id);
+        }
+        else
+        {
+            throw new Exception("Prodotto corrispondente non trovato!", 404);
+        }        
     }
 
     public function catalogo()
@@ -90,13 +97,14 @@ Class Prodotto
         for ($i=0; $i < count($risultato); $i++) {
             // Creo una nuova istanza del prodotto
             $prodotto = new Prodotto();
+
             // Popolo l'istanza
             $prodotto->popolaProdotto($risultato[$i]["id"]);
 
             // Aggiungo il prodotto all'array del catalogo
-            $catalogo[] = $prodotto
+            $catalogo[] = $prodotto;
         }
-
+        
         return $catalogo;
     }
 }

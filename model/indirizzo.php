@@ -30,5 +30,20 @@ Class Indirizzo
         // Eseguo
         $stmt->execute();
     }
+
+    public function ottieniIndirizzi($utente)
+    {
+        $sql = "SELECT i.id, i.via, i.civico, i.comune, i.provincia, i.cap
+                FROM indirizzo i
+                WHERE i.utente = :utente";
+
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
+
+        // Eseguo
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>

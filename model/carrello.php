@@ -41,6 +41,25 @@ Class Carrello
         return $risultato = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function numeroElementi($utente)
+    {
+        $sql = "SELECT COUNT(v.`id`) as elementi
+                FROM carrello c
+                INNER JOIN variante v ON c.`variante` = v.`id`
+                INNER JOIN prodotto p ON p.`id` = v.`prodotto`
+                WHERE c.`utente` = :utente";
+
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
+
+        // Eseguo
+        $stmt->execute();
+
+        $risultato = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $risultato[0]["elementi"];
+    }
+
     public function svuotaCarrello($utente)
     {
         // Elimino tutti i record nel carrello che corrispondono con un determinato utente

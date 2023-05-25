@@ -18,10 +18,26 @@ if (empty($data->email) || empty($data->password)) {
 
 $sessione = new Sessione();
 
-try {
-    $sessione->creaSessione($data->email, $data->password);
+try
+{
+    $result = $sessione->creaSessione($data->email, $data->password);
 
-    echo json_encode(array("ID" => $sessione->SessionID));
+    if ($result == 0)
+    {
+        http_response_code(200);
+        echo json_encode(array("ID" => $sessione->SessionID));
+    }
+    else if ($result == 1)
+    {
+        http_response_code(401);
+        echo json_encode(array("message" => "Credenziali non corrette!"));
+    }
+    else
+    {
+        http_response_code(500);
+        echo json_encode(array("message" => "Errore interno, contattare l'amministratore di sistema"));
+    }
+    
 } catch (Exception $e) {
     echo json_encode(array("message" => $e->getMessage()));
 }

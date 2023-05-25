@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . "/../common/connect.php";
+require_once __DIR__ . "/carrello.php";
 
 Class Ordine
 {
@@ -23,33 +24,42 @@ Class Ordine
 
     public function creaOrdine($utente)
     {
-        // Creo l'ordine
-        $sql = "INSERT INTO ordine_prodotto ( utente, stato, attivo )
-                VALUES ( :utente, 'Inviato', TRUE )";
+        $carrello = new Carrello();
+        
+        if ($carrello->numeroElementi($utente) > 0)
+        {
+            // Creo l'ordine
+            $sql = "INSERT INTO ordine ( utente, stato, attivo )
+                    VALUES ( :utente, 'Inviato', TRUE )";
 
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
+            $stmt = $this->connection->prepare($sql);
+            $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
 
-        // Eseguo
-        $stmt->execute();
+            // Eseguo
+            $stmt->execute();
 
-        // Ottengo l'id dell'ordine appena creato
-        $ordine = $stmt->lastInsertId();
+            // Ottengo l'id dell'ordine appena creato
+            $ordine = $stmt->lastInsertId();
 
-        // Sposto i prodotti dal carrello all'ordine
-        $sql = "INSERT INTO ordine ( ordine, variante, quantita )
-                SELECT :ordine, v.`id` AS 'variante', c.quantita AS 'quantita'
-                FROM carrello c
-                INNER JOIN variante v ON c.`variante` = v.`id`
-                INNER JOIN prodotto p ON p.`id` = v.`prodotto`
-                WHERE c.`utente` = :utente";
+            // Sposto i prodotti dal carrello all'ordine
+            $sql = "INSERT INTO ordine ( ordine, variante, quantita )
+                    SELECT :ordine, v.`id` AS 'variante', c.quantita AS 'quantita'
+                    FROM carrello c
+                    INNER JOIN variante v ON c.`variante` = v.`id`
+                    INNER JOIN prodotto p ON p.`id` = v.`prodotto`
+                    WHERE c.`utente` = :utente";
 
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
-        $stmt->bindValue(':ordine', $ordine, PDO::PARAM_INT);
+            $stmt = $this->connection->prepare($sql);
+            $stmt->bindValue(':utente', $utente, PDO::PARAM_INT);
+            $stmt->bindValue(':ordine', $ordine, PDO::PARAM_INT);
 
-        // Eseguo
-        $stmt->execute();
+            // Eseguo
+            $stmt->execute();
+        }
+        else
+        {
+            throw new Exception("Carrello vuoto", 404);
+        }
     }
 
     public function visualizzaOrdine($utente, $ordine)

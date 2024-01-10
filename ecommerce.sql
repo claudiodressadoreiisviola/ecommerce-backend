@@ -1,8 +1,10 @@
+INSTALL SONAME 'auth_ed25519';
+
 DROP DATABASE IF EXISTS ecommerce;
 
 CREATE DATABASE IF NOT EXISTS ecommerce;
 
-CREATE USER IF NOT EXISTS 'ecommerce'@'%' IDENTIFIED BY 'ecommerce';
+CREATE USER 'ecommerce'@'%' IDENTIFIED VIA ed25519 USING PASSWORD('ecommerce');
 
 GRANT ALL PRIVILEGES ON ecommerce.* TO 'ecommerce'@'%';
 
